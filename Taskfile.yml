@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - gogio -target=windows -icon=qr-code-svgrepo-com.png -o qrgenclip.exe .
+    platforms: [windows]
+    desc: Build Windows with icon  
+
+  default:
+    - task: build
