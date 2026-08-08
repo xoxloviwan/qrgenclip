@@ -60,18 +60,21 @@ func run(w *app.Window) error {
 
 	var ops op.Ops
 	th := material.NewTheme()
+
+	var textSelectable widget.Selectable
+	textSelectable.SetText(string(text))
 	for {
 		e := w.Event()
 		switch e := e.(type) {
 		case app.DestroyEvent:
 			return e.Err
 		case app.FrameEvent:
-			handleFrameEvent(&ops, e, &imgWidget, th, string(text))
+			handleFrameEvent(&ops, e, &imgWidget, th, &textSelectable)
 		}
 	}
 }
 
-func handleFrameEvent(ops *op.Ops, e app.FrameEvent, imgWidget *widget.Image, th *material.Theme, clipText string) {
+func handleFrameEvent(ops *op.Ops, e app.FrameEvent, imgWidget *widget.Image, th *material.Theme, textSelectable *widget.Selectable) {
 	gtx := app.NewContext(ops, e)
 
 	// Оборачиваем всё в layout.Center для вертикального центрирования
@@ -102,10 +105,12 @@ func handleFrameEvent(ops *op.Ops, e app.FrameEvent, imgWidget *widget.Image, th
 
 			// 2. Текст под QR-кодом
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				label := material.Label(th, unit.Sp(16), clipText)
+				label := material.Label(th, unit.Sp(16), textSelectable.Text())
 				label.Alignment = giotext.Middle
 				label.MaxLines = 3
+				label.State = textSelectable
 
+				// Ограничиваем ширину
 				gtx.Constraints.Max.X -= 40
 				gtx.Constraints.Min.X = 0
 
